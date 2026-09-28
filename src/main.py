@@ -2,7 +2,10 @@ from ticket_manager import load_tickets, clean_tickets
 from llm_engine import analyze_ticket_with_ollama
 import json
 from datetime import datetime
+from dashboard import dashboard
+from pathlib import Path
 
+RESULT_FILE_PATH = Path("output/results.json")
 def main():
     print("Chargement des tickets depuis tickets.json...")
     tickets_path = "data/tickets.json"
@@ -22,30 +25,31 @@ def main():
         if isinstance(analysis, dict):
             formated_analyze = analysis
         else:
-            formated_analyze = analysis.model_dump()
+            formated_analyze = analysis.model_dump(mode="json")
         ticket_handled = {
             "initial_ticket": ticket,
             "analysis": formated_analyze
         }
         
         results.append(ticket_handled)
-        categorie = formated_analyze.get("category", "N/A")
-        severite = formated_analyze.get("severity", "N/A")
+        category = formated_analyze.get("categorie", "N/A")
+        severity = formated_analyze.get("severite", "N/A")
         
-        print(f"Ticket {ticket['id']} analysé : Catégorie - {categorie}, Sévérité - {severite}")
+        print(f"Ticket {ticket['id']} analysé : Catégorie - {category}, Sévérité - {severity}")
         
     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     data = {
-        "derniere_mise_a_jour": date,
+        "derniere_maj": date,
         "total_tickets": len(results),
         "tickets": results
     }
-    print("\n💾 Sauvegarde des résultats dans 'results.json'...")
-    with open("results.json", "w", encoding="utf-8") as f:
+    RESULT_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    print("\n Sauvegarde des résultats dans 'results.json'...")
+    with open(RESULT_FILE_PATH, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
         
     print("Triage terminé !")
-
+    dashboard(results)
 if __name__ == "__main__":
     main()

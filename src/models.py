@@ -15,7 +15,7 @@ class TicketSentiment(str, Enum):
     NEGATIVE = "negative"
 
 class TicketAnalysis(BaseModel):
-    category: TicketCategory
-    severity: int = Field(ge=1, le=5)
+    categorie: TicketCategory
+    severite: int = Field(ge=1, le=5)
     sentiment: TicketSentiment
-    summary: str
+    resume: str
