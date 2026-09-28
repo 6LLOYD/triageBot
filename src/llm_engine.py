@@ -1,4 +1,5 @@
 import ollama
+from pydantic import ValidationError
 from models import TicketAnalysis
 
 SYSTEM_PROMPT = """Tu es un robot de tri strict pour le support client du jeu 'Dungeon Delivery'.
@@ -24,6 +25,7 @@ SYSTEM_PROMPT = """Tu es un robot de tri strict pour le support client du jeu 'D
 """
 MODEL_PROMPT = """Analyse le ticket suivant et retourne les informations demandées au format JSON strict."""
 MODEL_NAME = "llama3.1:8b"
+MAX_RETRIES = 2
 
 def analyze_ticket_with_ollama(ticket_message:str, model_name:str=MODEL_NAME) -> TicketAnalysis:
     """ Envoie un ticket a ollama et retourne l'analyse.
@@ -41,15 +43,27 @@ def analyze_ticket_with_ollama(ticket_message:str, model_name:str=MODEL_NAME) ->
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": f"{MODEL_PROMPT}\n\n{ticket_message}"}
     ]
-    response = ollama.chat(
-        model=model_name,
-        messages=messages,
-        format=TicketAnalysis.model_json_schema(),
-        options={"temperature": 0.0}
-    )
     
-    json_result = response['message']['content']
-    
-    analyzed_ticket = TicketAnalysis.model_validate_json(json_result)
-    
-    return analyzed_ticket
+    for attempt in range(MAX_RETRIES):
+        try:
+            response = ollama.chat(
+                model=model_name,
+                messages=messages,
+                format=TicketAnalysis.model_json_schema(),
+                options={"temperature": 0.0}
+            )
+            
+            json_result = response['message']['content']
+            analyzed_ticket = TicketAnalysis.model_validate_json(json_result)
+            
+            return analyzed_ticket
+        
+        except ValidationError as e:
+            print(f"Tentative {attempt + 1}/{MAX_RETRIES} échouée : Le LLM a renvoyé un format invalide.")
+            
+        except Exception as e:
+            print(f"🚨 Erreur critique de connexion avec Ollama : {e}")
+            break
+        
+    print("Échec de l'analyse, marquage 'to_check'.")
+    return {"status": "to_check"}
