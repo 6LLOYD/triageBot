@@ -2,4 +2,3 @@ ollama==0.4.7
 pydantic==2.13.4
 typer==0.15.1
 rich==13.9.4
-vaderSentiment==latest
