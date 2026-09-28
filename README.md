@@ -88,4 +88,4 @@ La sévérité va de 1 (faible) à 5 (critique).
 
 Avant d’envoyer un message à Ollama, le bot recherche sans tenir compte de la casse des expressions typiques d’une tentative de manipulation, par exemple `ignore`, `instructions précédentes`, `system override` ou `tu es maintenant`. Si une expression est détectée, le ticket est bloqué avant l’appel au modèle et reçoit directement la catégorie `toxicity`, la sévérité 1 et le résumé `[BLOQUÉ] Tentative d’injection de prompt.`
 
-Cette parade évite de laisser le modèle suivre les instructions contenues dans les tickets repérés. Elle repose toutefois sur une liste de mots-clés : elle peut manquer une formulation inconnue ou signaler à tort un message légitime. Ce filtre est une première défense, pas une garantie de sécurité complète.
+Cette parade évite de laisser le modèle suivre les instructions contenues dans les tickets repérés. Elle repose toutefois sur une liste de mots-clés, elle peut manquer une formulation inconnue ou signaler à tort un message légitime. Ce filtre est une première défense, pas une garantie de sécurité complète.

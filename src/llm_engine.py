@@ -62,7 +62,7 @@ def analyze_ticket_with_ollama(ticket_message:str, model_name:str=MODEL_NAME) ->
             print(f"Tentative {attempt + 1}/{MAX_RETRIES} échouée : Le LLM a renvoyé un format invalide.")
             
         except Exception as e:
-            print(f"🚨 Erreur critique de connexion avec Ollama : {e}")
+            print(f" Erreur critique de connexion avec Ollama : {e}")
             break
         
     print("Échec de l'analyse, marquage 'to_check'.")
