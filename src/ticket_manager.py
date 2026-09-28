@@ -43,5 +43,5 @@ def clean_tickets(raw_tickets: list[dict])->list[dict]:
         seen_tickets.add(signature)
         cleaned_tickets.append(ticket)
         
-    print(f"✨ Nettoyage terminé : {len(cleaned_tickets)} tickets conservés sur {len(raw_tickets)}.\n")
+    print(f"Nettoyage terminé : {len(cleaned_tickets)} tickets conservés sur {len(raw_tickets)}.\n")
     return cleaned_tickets
