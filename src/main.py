@@ -1,11 +1,12 @@
-from ticket_manager import load_tickets
+from ticket_manager import load_tickets, clean_tickets
 from llm_engine import analyze_ticket_with_ollama
 import json
 
 def main():
     print("Chargement des tickets depuis tickets.json...")
     tickets_path = "data/tickets.json"
-    tickets = load_tickets(tickets_path)
+    raw_tickets = load_tickets(tickets_path)
+    tickets = clean_tickets(raw_tickets)
     
     if not tickets:
         print("Aucun ticket à analyser. Veuillez vérifier le fichier tickets.json.")
