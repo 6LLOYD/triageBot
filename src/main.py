@@ -1,4 +1,4 @@
-from ticket_manager import load_tickets, clean_tickets
+from ticket_manager import detect_prompt_injection, load_tickets, clean_tickets
 from llm_engine import analyze_ticket_with_ollama
 import json
 from datetime import datetime
@@ -21,11 +21,20 @@ def main():
     results = []
     for ticket in tickets:
         message = ticket["message"]
-        analysis = analyze_ticket_with_ollama(message)
-        if isinstance(analysis, dict):
-            formated_analyze = analysis
+        if detect_prompt_injection(message):
+            print(f" [SÉCURITÉ] Injection détectée sur le ticket #{ticket['id']} ! Blocage immédiat.")
+            formated_analyze = {
+                "categorie": "toxicity",
+                "severite": 1,
+                "sentiment": "negative",
+                "resume": "[BLOQUÉ] Tentative d'injection de prompt."
+            }
         else:
-            formated_analyze = analysis.model_dump(mode="json")
+            analysis = analyze_ticket_with_ollama(message)
+            if isinstance(analysis, dict):
+                formated_analyze = analysis
+            else:
+                formated_analyze = analysis.model_dump(mode="json")
         ticket_handled = {
             "initial_ticket": ticket,
             "analysis": formated_analyze

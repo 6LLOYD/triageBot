@@ -45,3 +45,26 @@ def clean_tickets(raw_tickets: list[dict])->list[dict]:
         
     print(f"Nettoyage terminé : {len(cleaned_tickets)} tickets conservés sur {len(raw_tickets)}.\n")
     return cleaned_tickets
+
+def detect_prompt_injection(message: str) -> bool:
+    """
+    Agit comme un antivirus. Détecte les tentatives de manipulation du LLM.
+    """
+    msg_min = message.lower()
+    
+    restricted_terms = [
+        "ignore",
+        "instructions précédentes",
+        "previous instructions",
+        "system override",
+        "tu es maintenant",
+        "you are now",
+        "oublie tout",
+        "bypass"
+    ]
+    
+    for word in restricted_terms:
+        if word in msg_min:
+            return True
+            
+    return False
